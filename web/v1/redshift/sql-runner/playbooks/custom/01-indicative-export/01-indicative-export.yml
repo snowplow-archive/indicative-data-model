@@ -1,0 +1,30 @@
+:targets:
+- :name:
+  :type:     redshift
+  :host:
+  :database:
+  :port:
+  :username:
+  :password:
+  :ssl:
+:variables:
+  :input_schema:       atomic
+  :scratch_schema:     scratch
+  :output_schema:      derived
+  :entropy:            ""
+:steps:
+- :name: 01-indicative-export-setup
+  :queries:
+    - :name: 01-indicative-export-setup
+      :file: custom/01-indicative-export/01-indicative-export-setup.sql
+      :template: true
+- :name: 02-indicative-export-staged
+  :queries:
+    - :name: 02-indicative-export-staged
+      :file: custom/01-indicative-export/02-indicative-export-staged.sql
+      :template: true
+- :name:
+  :queries:
+    - :name: 03-indicative-export-upsert
+      :file: custom/01-indicative-export/03-indicative-export-upsert.sql
+      :template: true
