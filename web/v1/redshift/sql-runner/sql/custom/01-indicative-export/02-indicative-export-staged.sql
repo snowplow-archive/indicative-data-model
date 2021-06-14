@@ -102,7 +102,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
               e.collector_tstamp,
               e.event_name,
               CASE
-                  WHEN event_name = 'page_view' & page_urlpath = '/' THEN 'Homepage View'
+                  WHEN event_name = 'page_view' AND page_urlpath = '/' THEN 'Homepage View'
                   ELSE event_name
                   END AS custom_event_name, -- example derived event name field
               e.derived_tstamp
@@ -151,7 +151,8 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
               domain_userid,
               MIN(derived_tstamp) AS first_seen_tstamp
           FROM {{.atomic_schema}}.events_staged{{.entropy}}
-          WHERE app_id = 'website')
+          WHERE app_id = 'website'
+          GROUP BY 1,2)
 SELECT
     c.*,
     CASE
