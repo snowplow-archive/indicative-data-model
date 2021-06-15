@@ -102,9 +102,9 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
               e.collector_tstamp,
               e.event_name,
               CASE
-                  WHEN event_name = 'page_view' AND page_urlpath = '/' THEN 'Homepage View'
+                  WHEN event_name = 'page_view' AND page_urlpath = '/' THEN 'homepage_view'
                   ELSE event_name
-                  END AS custom_event_name, -- example derived event name field
+              END AS custom_event_name, -- example derived event name field
               e.derived_tstamp
           FROM {{.atomic_schema}}.events_staged{{.entropy}} AS e
           WHERE app_id = 'website'),
