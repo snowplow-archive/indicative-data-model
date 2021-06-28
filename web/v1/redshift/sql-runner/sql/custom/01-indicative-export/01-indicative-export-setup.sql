@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS {{.output_schema}}.indicative_export{{.entropy}} (
   sign_up_service_type        VARCHAR(64) ENCODE ZSTD,
   demo_request_company        VARCHAR(255) ENCODE ZSTD,
   demo_request_email          VARCHAR(255) ENCODE ZSTD,
+  demo_request_email          VARCHAR(255) ENCODE ZSTD,
   demo_request_insights       BOOLEAN ENCODE ZSTD,
   page_view_id                CHAR(36) ENCODE ZSTD,
   alias_user_id               varCHAR(255) ENCODE ZSTD
@@ -124,9 +125,9 @@ DISTKEY (event_id)
 SORTKEY (collector_tstamp);
 
 CREATE TABLE IF NOT EXISTS {{.output_schema}}.user_stitching{{.entropy}} (
-  domain_userid,
-  user_id,
-  first_seen_tstamp
+  domain_userid VARCHAR(128) ENCODE ZSTD,
+  user_id VARCHAR(255) ENCODE ZSTD,
+  first_seen_tstamp TIMESTAMP ENCODE ZSTD
 );
 DISTSTYLE KEY
 DISTKEY (domain_userid)

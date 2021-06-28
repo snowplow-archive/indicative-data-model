@@ -152,7 +152,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
        domain_userid,
        user_id AS custom_user_id,
        MIN(derived_tstamp) AS first_seen_tstamp
-     FROM {{.scratch_schema}}.user_mapping{{.entropy}}
+     FROM {{.scratch_schema}}.user_stitching{{.entropy}}
      GROUP BY 1,2)
 SELECT
   c.app_id,
