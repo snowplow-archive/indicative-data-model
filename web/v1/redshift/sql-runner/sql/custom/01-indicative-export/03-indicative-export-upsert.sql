@@ -1,4 +1,4 @@
--- 3. DELETE - INSERT to production (and optionally drop the temp table)
+-- 3. DELETE - INSERT to production
 
 BEGIN; --it is safest to use a transaction, in case of failure.
 
