@@ -19,7 +19,7 @@ You will need to be running at least [`v1.0.0`](https://github.com/snowplow/data
 
 To integrate this custom module into your `sql-runner` model, you can clone this repo, and move the files into the `custom` folder structure within your existing model - both in the appropriate `playbooks` directory and the `sql` directory.
 
-You will also need to edit a couple of sections of the main query found in [02-indicative-export-staged.sql](web/v1/redshift/sql-runner/sql/custom/01-indicative-export/02-indicative-export-staged.sql).
+You will also need to edit a couple of sections of the main query found in [03-indicative-export-staged.sql](web/v1/redshift/sql-runner/sql/custom/01-indicative-export/03-indicative-export-staged.sql).
 
 ## Editing the main query
 ### `custom_event_name`
@@ -27,8 +27,8 @@ The first area that you may customise is the `custom_event_name` field.
 
 ```
 CASE
-    WHEN event_name = 'page_view' AND page_urlpath = '/' THEN 'homepage_view'
-    ELSE event_name
+  WHEN event_name = 'page_view' AND page_urlpath = '/' THEN 'homepage_view'
+  ELSE event_name
 END AS custom_event_name, -- example derived event name field
 ```
 In the above example, we use a `CASE` statement to pick out page views of the homepage as a custom event name (`homepage_view`) that will populate this column. In Indicative, you may want to call out something like this as a specific event, rather than filtering for `page_views` and then filtering for page URL being the homepage (`/`). This is less performant within Indicative, so calling out custom event names that are derived from your Snowplow events can be useful.
