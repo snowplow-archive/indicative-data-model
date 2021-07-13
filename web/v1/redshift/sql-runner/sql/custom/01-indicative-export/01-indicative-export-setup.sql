@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS {{.output_schema}}.indicative_export{{.entropy}} (
   demo_request_email          VARCHAR(255) ENCODE ZSTD,
   demo_request_insights       BOOLEAN ENCODE ZSTD,
   page_view_id                CHAR(36) ENCODE ZSTD,
-  alias_user_id               varCHAR(255) ENCODE ZSTD
+  alias_user_id               VARCHAR(255) ENCODE ZSTD
 )
 DISTSTYLE KEY
 DISTKEY (event_id)
@@ -128,8 +128,18 @@ CREATE TABLE IF NOT EXISTS {{.output_schema}}.user_stitching{{.entropy}} (
   domain_userid VARCHAR(128) ENCODE ZSTD,
   user_id VARCHAR(255) ENCODE ZSTD,
   first_seen_tstamp TIMESTAMP ENCODE ZSTD
-);
+)
 DISTSTYLE KEY
 DISTKEY (domain_userid)
 SORTKEY (first_seen_tstamp);
 
+    -- Create a limit for this run - single row table.
+DROP TABLE IF EXISTS {{.scratch_schema}}.pv_run_limits{{.entropy}};
+
+CREATE TABLE {{.scratch_schema}}indicative_run_limits{{.entropy}} AS(
+  SELECT
+    MIN(collector_tstamp) AS lower_limit,
+    MAX(collector_tstamp) AS upper_limit
+
+  FROM
+    {{.scratch_schema}}.events_staged{{.entropy}};

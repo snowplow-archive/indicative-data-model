@@ -145,7 +145,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
      AND wsf.root_tstamp = b.collector_tstamp
      LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_website_demo_request_1 AS dr
      ON dr.root_id = b.event_id
-     AND dr.root_tstamp = b.collector_tstamp
+     AND dr.root_tstamp = b.collector_tstamp),
 
   user_mapping AS
     (SELECT
@@ -154,6 +154,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
        MIN(derived_tstamp) AS first_seen_tstamp
      FROM {{.scratch_schema}}.user_stitching{{.entropy}}
      GROUP BY 1,2)
+
 SELECT
   c.app_id,
   c.br_family,

@@ -1,7 +1,9 @@
 -- Create user mapping tables for this run
 -- Also update the output table in preparation for joining to `indicative_export_staged` table
 
-CREATE TABLE {{.scratch_schema}}.user_stitching_this_run{{.entropy}} AS (
+DROP TABLE IF EXISTS {{.scratch_schema}}.user_stitching_this_run_staged{{.entropy}};
+
+CREATE TABLE {{.scratch_schema}}.user_stitching_this_run_staged{{.entropy}} AS (
 
   WITH users_this_run AS (
     SELECT
@@ -21,13 +23,11 @@ CREATE TABLE {{.scratch_schema}}.user_stitching_this_run{{.entropy}} AS (
   AND us.first_seen_tstamp < utr.first_seen_tstamp
 );
 
-DELETE FROM {{.output_schema}}.user_stitching {{.entropy}}
-WHERE domain_userid IN (SELECT domain_userid FROM {{.scratch_schema}}.user_stitching_this_run{{.entropy}}
-AND first_seen_tstamp > (SELECT MIN(first_seen_tstamp) FROM {{.scratch_schema}}.user_stitching_this_run{{.entropy}});
+DELETE FROM {{.output_schema}}.user_stitching{{.entropy}}
+WHERE domain_userid IN (SELECT domain_userid FROM {{.scratch_schema}}.user_stitching_this_run_staged{{.entropy}}
+AND first_seen_tstamp >= (SELECT MIN(first_seen_tstamp) FROM {{.scratch_schema}}.user_stitching_this_run_staged{{.entropy}});
 
-UPDATE {{.output_schema}}.indicative_export set alias_user_id = COALESCE(userfields)
-FROM {{.scratch_schema}}.user_stitching_this_run{{.entropy}}
-WHERE {{.output_schema}}.user_stitching.domain_userid = {{.scratch_schema}}.user_stitching_this_run.domain_userid
-AND {{.output_schema}}.user_stitching.derived_tstamp >= (SELECT MIN(first_seen_tstamp) FROM {{.scratch_schema}}.user_stitching_this_run{{.entropy}});
-
-
+INSERT INTO {{.output_schema}}.user_stitching{{.entropy}} (
+  SELECT * FROM {{.scratch_schema}}.user_stitching_this_run{{.entropy}}
+  WHERE domain_userid NOT IN (SELECT domain_userid FROM {{.output_schema}}.user_stitching{{.entropy}} GROUP BY 1)
+);

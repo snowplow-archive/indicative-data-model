@@ -10,7 +10,7 @@ The module is basically a simple `SELECT` statement that in the first CTE (`base
 
 The following CTE (`child_table_joins`) then joins to all the custom entity and event tables (in Redshift) and selects relevant columns.
 
-The next CTE (`user_mapping`) creates a user mapping table so that the aliases user ID can be applied to anonymous events, by looking through the users' history and if there is a custom user ID set for this user, uses this. 
+The next CTE (`user_mapping`) creates a user mapping table so that the aliases user ID can be applied to anonymous events, by looking through the users' history and if there is a custom user ID set for this user, uses this. This is pulled from a `user_stitching` table that is incrementally updated with new user data each run.  
 
 The files contained in this repo are all of files and folders necessary for integrating into `sql-runner`.
 
