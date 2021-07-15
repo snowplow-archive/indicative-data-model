@@ -107,7 +107,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
       END AS custom_event_name, -- example derived event name field
       e.derived_tstamp,
       e.page_view_id
-    FROM {{.atomic_schema}}.events_staged{{.entropy}} AS e
+    FROM {{.scratch_schema}}.events_staged{{.entropy}} AS e
     WHERE app_id = 'website'),
 
   child_table_joins AS
@@ -131,19 +131,19 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
        dr.email AS demo_request_email,
        dr.insights AS demo_request_insights
      FROM base_table AS b
-     LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_change_form_1 AS cf
+     LEFT JOIN {{.input_schema}}.com_snowplowanalytics_snowplow_change_form_1 AS cf
      ON cf.root_id = b.event_id -- add any necessary joins into your query and the necessary columns
      AND cf.root_tstamp = b.collector_tstamp
-     LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_submit_form_1 AS sf
+     LEFT JOIN {{.input_schema}}.com_snowplowanalytics_snowplow_submit_form_1 AS sf
      ON sf.root_id = b.event_id
      AND sf.root_tstamp = b.collector_tstamp
-     LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_link_click_1 AS lc
+     LEFT JOIN {{.input_schema}}.com_snowplowanalytics_snowplow_link_click_1 AS lc
      ON lc.root_id = b.event_id
      AND lc.root_tstamp = b.collector_tstamp
-     LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_website_signup_form_submitted_1 AS wsf
+     LEFT JOIN {{.input_schema}}.com_snowplowanalytics_snowplow_website_signup_form_submitted_1 AS wsf
      ON wsf.root_id = b.event_id
      AND wsf.root_tstamp = b.collector_tstamp
-     LEFT JOIN {{.atomic_schema}}.com_snowplowanalytics_snowplow_website_demo_request_1 AS dr
+     LEFT JOIN {{.input_schema}}.com_snowplowanalytics_snowplow_website_demo_request_1 AS dr
      ON dr.root_id = b.event_id
      AND dr.root_tstamp = b.collector_tstamp),
 
@@ -151,7 +151,7 @@ CREATE TABLE {{.scratch_schema}}.indicative_export_staged{{.entropy}} AS
     (SELECT
        domain_userid,
        user_id AS custom_user_id,
-       MIN(derived_tstamp) AS first_seen_tstamp
+       MIN(first_seen_tstamp) AS first_seen_tstamp
      FROM {{.scratch_schema}}.user_stitching{{.entropy}}
      GROUP BY 1,2)
 
@@ -279,4 +279,5 @@ SELECT
 FROM child_table_joins AS c
 LEFT JOIN user_mapping AS u
 ON u.domain_userid = c.domain_userid
-AND u.first_seen_tstamp < c.derived_tstamp);
+AND u.first_seen_tstamp < c.derived_tstamp
+);

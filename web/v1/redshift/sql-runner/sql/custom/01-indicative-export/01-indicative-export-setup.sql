@@ -1,6 +1,6 @@
 -- 1. Create prod table
 
-CREATE TABLE IF NOT EXISTS {{.output_schema}}.indicative_export{{.entropy}} (
+CREATE TABLE IF NOT EXISTS {{.output_schema}}.indicative_export{{.entropy}}
 (
   app_id                      VARCHAR(255) ENCODE ZSTD,
   br_family                   VARCHAR(50) ENCODE ZSTD,
@@ -115,7 +115,6 @@ CREATE TABLE IF NOT EXISTS {{.output_schema}}.indicative_export{{.entropy}} (
   sign_up_service_type        VARCHAR(64) ENCODE ZSTD,
   demo_request_company        VARCHAR(255) ENCODE ZSTD,
   demo_request_email          VARCHAR(255) ENCODE ZSTD,
-  demo_request_email          VARCHAR(255) ENCODE ZSTD,
   demo_request_insights       BOOLEAN ENCODE ZSTD,
   page_view_id                CHAR(36) ENCODE ZSTD,
   alias_user_id               VARCHAR(255) ENCODE ZSTD
@@ -124,7 +123,7 @@ DISTSTYLE KEY
 DISTKEY (event_id)
 SORTKEY (collector_tstamp);
 
-CREATE TABLE IF NOT EXISTS {{.output_schema}}.user_stitching{{.entropy}} (
+CREATE TABLE IF NOT EXISTS {{.scratch_schema}}.user_stitching{{.entropy}} (
   domain_userid VARCHAR(128) ENCODE ZSTD,
   user_id VARCHAR(255) ENCODE ZSTD,
   first_seen_tstamp TIMESTAMP ENCODE ZSTD
@@ -134,12 +133,13 @@ DISTKEY (domain_userid)
 SORTKEY (first_seen_tstamp);
 
     -- Create a limit for this run - single row table.
-DROP TABLE IF EXISTS {{.scratch_schema}}.pv_run_limits{{.entropy}};
+DROP TABLE IF EXISTS {{.scratch_schema}}.indicative_run_limits{{.entropy}};
 
-CREATE TABLE {{.scratch_schema}}indicative_run_limits{{.entropy}} AS(
+CREATE TABLE {{.scratch_schema}}.indicative_run_limits{{.entropy}} AS (
   SELECT
     MIN(collector_tstamp) AS lower_limit,
     MAX(collector_tstamp) AS upper_limit
 
   FROM
-    {{.scratch_schema}}.events_staged{{.entropy}};
+    {{.scratch_schema}}.events_staged{{.entropy}}
+);
